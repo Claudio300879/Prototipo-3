@@ -14,7 +14,8 @@ function Comida:new(x, y, sprite)
 end
 
 function Comida:reposicionar(anchoPantalla, world)
-    self.x = math.random(15, anchoPantalla - 15)
+    -- Aumentamos el margen de 15 a 45 para que no aparezca pegada a las paredes
+    self.x = math.random(45, anchoPantalla - 45)
     if world then
         world:update(self, self.x - self.origen_x, self.y - self.origen_y)
     end

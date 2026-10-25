@@ -7,7 +7,7 @@ local UI = {
 }
 
 function UI.init()
-    -- Suscribir la interfaz a eventos personalizados del juego
+    -- Suscribe la interfaz a eventos personalizados del juego
     if Signal then
         Signal.register('comida_atrapada', function(puntosActuales)
             UI.puntos = puntosActuales or (UI.puntos + 1)
@@ -45,7 +45,7 @@ end
 function UI.draw()
     love.graphics.setColor(1, 1, 1, 1)
     
-    -- Dibujar marcador unificado arriba a la izquierda (evita superposiciones)
+    -- Dibuja  marcador unificado arriba a la izquierda (evita superposiciones)
     local textoHUD = string.format("Comida: %d / %d  |  Oleada: %d", UI.puntos, UI.objetivo, UI.oleadaActual)
     love.graphics.print(textoHUD, 10, 10)
     

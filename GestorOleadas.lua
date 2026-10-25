@@ -1,16 +1,17 @@
-local Class = require("lib.class")
-
+local class = require("lib.class")
+local Corrutinas = require("coroutines")
 local GestorOleadas = Class:extend()
 
 function GestorOleadas:new()
     self.oleadaActual = 1
     self.enPausaOleada = false
     self.textoOleada = ""
-    self.timerHandle = nil
     
     self.intervaloBase = 1.4
     self.velMinBase = 60
     self.velMaxBase = 85
+    
+    self.coroutineActiva = nil
 end
 
 function GestorOleadas:iniciar(numOleada)
@@ -22,23 +23,24 @@ function GestorOleadas:iniciarOleada()
     self.enPausaOleada = true
     self.textoOleada = "OLEADA " .. self.oleadaActual
 
-    -- Pausa de 1.5 segundos antes de lanzar las ventanas
-    Timer.after(1.5, function()
+    -- Creamos una corrutina para manejar la secuencia de la oleada de forma lineal
+    self.coroutineActiva = Corrutinas.crear(function()
+        -- 1. Pausa de 1.5 segundos antes de arrancar las ventanas
+        Corrutinas.esperar(1.5)
         self.enPausaOleada = false
-        self:programarSpawner()
-    end)
-end
-
-function GestorOleadas:programarSpawner()
-    local intervaloActual = math.max(0.5, self.intervaloBase - (self.oleadaActual - 1) * 0.25)
-    
-    if self.timerHandle then
-        Timer.cancel(self.timerHandle)
-    end
-
-    self.timerHandle = Timer.every(intervaloActual, function()
-        if MaquinaEstados.actual == MaquinaEstados.estados["jugando"] and not mostrarBien and not self.enPausaOleada then
-            self:generarVentana()
+        
+        -- Calculamos el intervalo actual según la oleada
+        local intervaloActual = math.max(0.5, self.intervaloBase - (self.oleadaActual - 1) * 0.25)
+        
+        -- Bucle de generación de ventanas (puedes ajustar el límite por oleada)
+        for i = 1, 15 do
+            -- Esperamos el intervalo de tiempo entre cada ventana sin bloquear el juego
+            Corrutinas.esperar(intervaloActual)
+            
+            -- Verificamos si estamos en juego y no hay menús o pausas activas
+            if MaquinaEstados.actual == MaquinaEstados.estados["jugando"] and not mostrarBien then
+                self:generarVentana()
+            end
         end
     end)
 end
@@ -59,10 +61,7 @@ function GestorOleadas:avanzarOleada(nuevaOleada)
 end
 
 function GestorOleadas:detener()
-    if self.timerHandle then
-        Timer.cancel(self.timerHandle)
-        self.timerHandle = nil
-    end
+    self.enPausaOleada = false
 end
 
 function GestorOleadas:draw()

@@ -1,5 +1,5 @@
-local Class = require("lib.class")
-
+local class = require("lib.class")
+local Corrutinas = require("coroutines")
 local Ventana = Class:extend()
 
 function Ventana:new(x, y, velocidad, sprite)
@@ -10,9 +10,27 @@ function Ventana:new(x, y, velocidad, sprite)
     self.velocidad = velocidad or 70
     self.sprite = sprite
     self.tipo = "ventana"
+    
+    -- Control de movimiento mediante corrutina
+    self.cayendo = false
+    self:iniciarRutinaComportamiento()
+end
+
+function Ventana:iniciarRutinaComportamiento()
+    Corrutinas.crear(function()
+        -- 1. FASE DE ADVERTENCIA: La ventana se queda pausada arriba durante 0.5s
+        self.cayendo = false
+        Corrutinas.esperar(0.5)
+        
+        -- 2. FASE DE CAÍDA: Empieza a caer hacia abajo
+        self.cayendo = true
+    end)
 end
 
 function Ventana:update(dt, world, mosca)
+    -- Solo se desplaza si la corrutina dio luz verde a la caída
+    if not self.cayendo then return end
+
     local desplazamientoY = self.velocidad * dt
     self.y = self.y + desplazamientoY
 
@@ -23,13 +41,13 @@ function Ventana:update(dt, world, mosca)
         if mosca then
             local mx = mosca.x - mosca.origen_x
             local my = mosca.y - mosca.origen_y
-            
+
             -- Verificar si el rectángulo de la ventana colisiona con el de la mosca
             if self.x < mx + mosca.ancho and
                self.x + self.ancho > mx and
                self.y < my + mosca.alto and
                self.y + self.alto > my then
-                
+
                 -- Arrastra a la mosca hacia abajo
                 mosca.y = mosca.y + desplazamientoY
                 world:update(mosca, mosca.x - mosca.origen_x, mosca.y - mosca.origen_y)

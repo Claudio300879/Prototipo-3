@@ -4,6 +4,7 @@ require("animaciones")
 gestorOleadas = require("GestorOleadas")
 
 --  módulos de estados
+local Corrutinas = require("coroutines")
 local EstadoMenu     = require("estados.EstadoMenu")
 local EstadoReglas   = require("estados.EstadoReglas")
 local EstadoJugando  = require("estados.EstadoJugando")
@@ -73,7 +74,7 @@ function ReiniciarJuego()
 end
 
 function love.load()
-    love.window.setTitle("Prototipo 3 - Eventos")
+    love.window.setTitle("Prototipo 4-Singleton, Object Pool, Corrutinas y Data Locality")
     love.window.setMode(pantalla.ancho * pantalla.escala, pantalla.alto * pantalla.escala)
     love.graphics.setDefaultFilter("nearest", "nearest")
     lienzo = love.graphics.newCanvas(pantalla.ancho, pantalla.alto)
@@ -123,6 +124,7 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+    Corrutinas.actualizar(dt) -- Actualiza todas las corrutinas activas
     Timer.update(dt)
     UI.update(dt) -- Actualiza el tiempo de duración de los textos del HUD
     MaquinaEstados:update(dt)

@@ -34,14 +34,13 @@ function Mosca:update(dt, world, limiteAncho, limiteAlto)
 
     local cols, len = {}, 0
 
-    -- Si se mueve, actualiza la  posición mediante Bump
     if dx ~= 0 or dy ~= 0 then
-        local metaX = math.max(self.origen_x, math.min(limiteAncho - self.origen_x, self.x + dx))
+        local margenLateral = 8
+        local metaX = math.max(self.origen_x + margenLateral, math.min(limiteAncho - self.origen_x - margenLateral, self.x + dx))
         local metaY = math.max(self.origen_y, math.min(limiteAlto + 20, self.y + dy))
 
-        
         local actualX, actualY, c, l = world:move(self, metaX - self.origen_x, metaY - self.origen_y, function(item, other)
-            if other.tipo == "ventana" then
+            if other.tipo == "ventana" or other.tipo == "humo" then
                 return "touch"
             elseif other.tipo == "comida" then
                 return "cross"
@@ -54,7 +53,6 @@ function Mosca:update(dt, world, limiteAncho, limiteAlto)
         cols, len = c, l
     end
 
-    -- Actualiza la animación
     if self.animacion then
         ActualizarAnimacion(self.animacion, dt, false)
     end

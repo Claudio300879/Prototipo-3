@@ -1,23 +1,29 @@
 Fundamentos y Estructura Básica
+Máquina de Estados: Gestión de escenas con los estados "MENU", "REGLAS", "JUGANDO", "PAUSA", "GAME_OVER" y "VICTORIA".
 
-Máquina de Estados: "MENU", "REGLAS", "JUGANDO", "PAUSA", "GAME_OVER" y "VICTORIA".
+Estructuras de Datos y Tablas: Control de entidades lógicas como mosca, comida, ventanas, pantalla y sonidos.
 
-Estructuras de Datos y Tablas: mosca, comida, ventanas, pantalla, sonidos.
-
-Ciclo de Vida de LÖVE2D y gestión de entradas: love.load(), love.update(dt), love.draw() , love.keypressed(key).
+Ciclo de Vida de LÖVE2D y Gestión de Entradas: Uso de funciones principales como love.load(), love.update(dt), love.draw() y love.keypressed(key).
 
 Sprites, Animaciones y Canvas Pixel-Art
+Spritesheets y Quads: Recorte y renderizado eficiente mediante love.graphics.newQuad().
 
-Spritesheets y Quads: love.graphics.newQuad().
+Procesamiento con ImageData: Manipulación de píxeles en tiempo de ejecución con imageData:mapPixel() para eliminar fondos y limpiar texturas.
 
-Procesamiento con ImageData:Funciones LimpiarFondoMosca y HacerTransparente hacen uso de imageData:mapPixel() en tiempo de ejecución para eliminar el fondo.
+Escalado Pixel-Art: Configuración de renderizado nítido con love.graphics.setDefaultFilter("nearest", "nearest") sobre un love.graphics.newCanvas() escalado.
 
-Escalado Pixel-Art: Configurado con love.graphics.setDefaultFilter("nearest", "nearest") y renderizado sobre un love.graphics.newCanvas(160, 240) escalado por 3.
+Audio, Colisiones y Físicas
+Colisiones AABB: Detección de superposición de cajas delimitadoras.
 
-Audio, Colisiones y Físicas Propias
+Hitboxes Ajustados y Física de Empuje: Márgenes personalizados para gestionar el bloqueo y empuje de obstáculos.
 
-Colisiones AABB: Comprueba la superposición de cajas delimitadoras.
+Sistema de Audio: Carga de efectos de sonido en modo "static" y música de fondo en bucle mediante "stream".
 
-Hitbox Ajustado y Física de Empuje: Aplica un margen (hitboxX, hitboxY, hitboxAlto) para detectar cuando la ventana empuja la mosca hacia abajo (mosca.y = posicionTopeY).
+Arquitectura Avanzada y Patrones de Diseño 
+Corrutinas (coroutine): Animaciones asíncronas fluidas para la variación orgánica de opacidad, escala y rotación de las nubes de gas tóxico (Raid).
 
-Sistema de Audio: Carga correcta de efectos en modo "static" (comiendo, derrota, victoria) y música de fondo continua en modo "stream" (fondo:setLooping(true)).
+Patrón Singleton: Instancia única centralizada mediante getInstance() para la gestión unificada de entidades y recursos globales.
+
+Patrón Object Pool: Reutilización eficiente de partículas y nubes para optimizar el uso de memoria en tiempo de ejecución.
+
+Diseño Orientado a Datos (Data Locality): Estructuración de arreglos planos y contiguos en memoria para acelerar el procesamiento secuencial de los elementos del humo.

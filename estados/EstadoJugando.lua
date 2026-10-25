@@ -1,8 +1,15 @@
 local Class = require("lib.class")
+local Humo = require("entidades.Humo")
 local EstadoJugando = Class:extend()
 
-function EstadoJugando:init()
+function EstadoJugando:new()
     self.mapa = STI("mapas/mapa1.lua")
+    -- Obtenemos la única instancia del humo mediante el Patrón Singleton
+    self.humoInstancia = Humo.getInstance("izq", pantalla.ancho, pantalla.alto)
+    
+    -- Creamos referencias directas de objetos para Bump (usando los anchos físicos)
+    self.humoIzq = { x = 0, y = 0, ancho = self.humoInstancia.ancho, alto = self.humoInstancia.alto, tipo = "humo" }
+    self.humoDer = { x = pantalla.ancho - self.humoInstancia.ancho, y = 0, ancho = self.humoInstancia.ancho, alto = self.humoInstancia.alto, tipo = "humo" }
 end
 
 function EstadoJugando:enter()
@@ -14,6 +21,14 @@ function EstadoJugando:enter()
         ReiniciarJuego()
         Signal.emit('cambiar_oleada', 1)
         Signal.emit('actualizar_puntos', 0)
+        
+        if world then
+            pcall(function() world:remove(self.humoIzq) end)
+            pcall(function() world:remove(self.humoDer) end)
+            
+            world:add(self.humoIzq, self.humoIzq.x, self.humoIzq.y, self.humoIzq.ancho, self.humoIzq.alto)
+            world:add(self.humoDer, self.humoDer.x, self.humoDer.y, self.humoDer.ancho, self.humoDer.alto)
+        end
     else
         desdePausa = false
         if sonidos.fondo then sonidos.fondo:play() end
@@ -21,6 +36,15 @@ function EstadoJugando:enter()
 end
 
 function EstadoJugando:update(dt)
+    if Corrutinas and Corrutinas.actualizar then
+        Corrutinas.actualizar(dt)
+    end
+
+    -- Actualizamos las corrutinas internas del humo
+    if self.humoInstancia then 
+        self.humoInstancia:update(dt) 
+    end
+
     if self.mapa then
         self.mapa:update(dt)
     end
@@ -30,7 +54,16 @@ function EstadoJugando:update(dt)
     local cols, len = mosca:update(dt, world, pantalla.ancho, pantalla.alto)
 
     for i = 1, len do
+        if cols[i].other.tipo == "humo" then
+            gestorOleadas:detener()
+            Signal.emit('juego_perdido')
+            return
+        end
+    end
+
+    for i = 1, len do
         local col = cols[i]
+        
         if col.other.tipo == "comida" then
             puntos = puntos + 1
             
@@ -49,6 +82,7 @@ function EstadoJugando:update(dt)
                     Signal.emit('cambiar_oleada', nuevaOleada)
                 end)
             end
+            break
         end
     end
 
@@ -83,6 +117,12 @@ function EstadoJugando:draw()
         end
 
         mosca:draw()
+
+        -- Dibujamos el humo en ambos laterales usando el Singleton
+        if self.humoInstancia then 
+            self.humoInstancia:drawLado("izq")
+            self.humoInstancia:drawLado("der") 
+        end
 
     love.graphics.setCanvas()
     love.graphics.draw(lienzo, 0, 0, 0, pantalla.escala, pantalla.escala)
